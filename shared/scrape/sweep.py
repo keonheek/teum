@@ -40,6 +40,10 @@ class Fetcher:
     """GET only. Checks robots.txt, spaces requests per host, caches every raw body."""
 
     def __init__(self, cache_dir, offline=False):
+        try:    # verify TLS against the OS trust store: all-con.co.kr sends an incomplete chain that certifi rejects
+            import truststore; truststore.inject_into_ssl()
+        except ImportError:
+            pass
         import requests
         self.s = requests.Session()
         self.s.headers.update({'User-Agent': UA, 'Accept-Language': 'ko-KR,ko;q=0.9'})
@@ -322,6 +326,60 @@ def sweep_link(f):
     return items
 
 
+# ---------- all-con (올콘) ----------
+ALLCON = 'https://www.all-con.co.kr'
+ALLCON_CATS = {4: ('문학·학술', 2), 5: ('과학·공학·학술', 2)}   # ct: (category, pages). The list is the site's own JSON, read by GET
+
+def allcon_date(s):
+    ds = [dt.date(2000 + int(a), int(b), int(c)) for a, b, c in re.findall(r'(\d\d)\.(\d\d)\.(\d\d)', s or '')]
+    return (ds[0], ds[-1]) if len(ds) >= 2 else (None, ds[0] if ds else None)
+
+def allcon_list(text):
+    try: rows = json.loads(text or '{}').get('rows') or []
+    except ValueError: return []
+    out = []
+    for r in rows:
+        if not r.get('cl_srl'): continue
+        out.append({'srl': str(r['cl_srl']), 'title': clean(r.get('cl_title', '')), 'host': clean(r.get('cl_host', '')),
+                    'status': clean(r.get('cl_status', '')), 'end': allcon_date(r.get('cl_date', ''))[1]})
+    return out
+
+def allcon_view(page):
+    if 'contest_info' not in (page or ''): return None
+    info = {k: clean(v) for k, v in re.findall(r"<td class='desc_(\w+)'[^>]*>(.*?)</td>", page, re.S)}
+    title = re.search(r'<h1>(.*?)</h1>', page, re.S)
+    img = re.search(r"class=\"contest_poster\".*?<img src='([^']+)'", page, re.S)
+    start, end = allcon_date(info.get('date', ''))
+    body = page.split('id="contest_info"', 1)[1][:60000]
+    # the site lumps 학술 into two broad categories; keep only the subject so kind comes from the title
+    cats = info.get('cate', '').replace('문학·학술', '문학/글').replace('과학·공학·학술', '과학/공학')
+    return {'title': clean(title[1]) if title else '', 'host': info.get('host', ''), 'cats': cats, 'target': info.get('target', ''),
+            'start': start, 'end': end, 'benefit': info.get('award', ''), 'elig': elig_lines(body),
+            'poster': urljoin(ALLCON, img[1]) if img else ''}
+
+def sweep_allcon(f):
+    cutoff = TODAY + dt.timedelta(days=RULES['balance']['min_days_left'])
+    rows, seen = [], set()
+    for ct, (_, pages) in ALLCON_CATS.items():
+        for p in range(1, pages + 1):
+            q = f'{ALLCON}/page/ajax.contest_list.php?page={p}&sortname=cl_order&sortorder=asc&stx=&sfl=&t=1&ct={ct}&sc=&tg='
+            got = allcon_list(f.get(q))
+            f.log.append(('www.all-con.co.kr', f'ct={ct}&page={p}', 'rows', len(got)))
+            for r in got:
+                if r['srl'] in seen or '접수중' not in r['status'] or (r['end'] and r['end'] < cutoff) or EXCLUDE.search(r['title']): continue
+                seen.add(r['srl']); rows.append(r)
+    items = []
+    for r in rows:
+        url = f"{ALLCON}/view/contest/{r['srl']}"
+        page = f.get(url)
+        v = allcon_view(page) if page else None
+        if not v: continue
+        items.append(dict(source='allcon', section='공모전', url=url, title=v['title'] or r['title'], host=v['host'] or r['host'],
+                          cats=v['cats'], target=v['target'], elig=v['elig'], start=v['start'], deadline=v['end'],
+                          benefit=v['benefit'], region='', term_start=None, term_end=None, team='', poster_src=v['poster']))
+    return items
+
+
 # ---------- rules ----------
 KIND_RULES = [(r['kind'], rx(r['match'])) for r in RULES['kind']['rules']]
 TAG_RULES = [(r['tag'], rx(r['match'])) for r in RULES['tags']['rules']]
@@ -387,6 +445,7 @@ def keep(it, why):
     if it['deadline'] < TODAY + dt.timedelta(days=RULES['balance']['min_days_left']): why['deadline passed'] += 1; return False
     if it['start'] and it['start'] > TODAY: why['not open yet'] += 1; return False
     if EXCLUDE.search(it['title']) or EXCLUDE_CATS.search(it['cats']): why['excluded title/category'] += 1; return False
+    if len(norm_title(it['title'])) < 5: why['title too vague'] += 1; return False
     if not eligible(it['target']): why['not 대학생'] += 1; return False
     return True
 
@@ -409,11 +468,17 @@ def normalise(it):
 
 
 # ---------- dedupe, curated skip, balance ----------
-SOURCE_RANK = {'linkareer': 0, 'wevity': 1, 'thinkcontest': 2}
+SOURCE_RANK = {'linkareer': 0, 'wevity': 1, 'allcon': 2, 'thinkcontest': 3}
 
-def similar(a, b):
+def tokens(title):
+    """Sorted word set of a normalised title, so '2027 포스텍 SF 어워드' equals '포스텍 2027 SF 어워드'."""
+    t = re.sub(r'\[[^\]]*\]|\([^)]*\)|【[^】]*】', ' ', clean(title).lower())
+    return ''.join(sorted(w for w in re.split(r'[^0-9a-z가-힣]+', re.sub(r'모집|안내|공고|신청|접수', ' ', t)) if w))
+
+def similar(a, b, ta='', tb=''):
     if not a or not b: return False
     if a == b or (min(len(a), len(b)) >= 8 and (a in b or b in a)): return True
+    if ta and ta == tb: return True
     return difflib.SequenceMatcher(None, a, b).ratio() >= 0.85
 
 def curated_titles(js_text):
@@ -422,9 +487,9 @@ def curated_titles(js_text):
 def dedupe(items, curated):
     out, why = [], Counter()
     for it in sorted(items, key=lambda x: SOURCE_RANK[x['source']]):
-        nt = norm_title(it['title'])
+        nt, tk = norm_title(it['title']), tokens(it['title'])
         if any(similar(nt, c) for c in curated): why['curated in ACTIVITIES'] += 1; continue
-        if any(similar(nt, norm_title(o['title'])) or
+        if any(similar(nt, norm_title(o['title']), tk, tokens(o['title'])) or
                (nt[:10] == norm_title(o['title'])[:10] and norm_title(it['host']) == norm_title(o['host'])) for o in out):
             why['duplicate across sources'] += 1; continue
         out.append(it)
@@ -452,8 +517,18 @@ def balance(items, cap):
                 if got >= n or len(picked) >= cap: return got
         return got
 
+    for m in MAJOR_KEYS:                                                              # 0) major-targeted listings are rare: keep them
+        take([x for x in pool if m in x['majors']], b.get('min_per_major', 0))
+    for kind, tags in b.get('min_kind_tag', {}).items():                              # 0b) e.g. 학술제 for 과학, 공학, 인문
+        for t, n in tags.items():
+            have = sum(1 for x in picked if x['kind'] == kind and t in x['tags'])
+            take([x for x in pool if x['kind'] == kind and t in x['tags']], n - have)
     for kind, n in b['min_per_kind'].items():                                        # 1) kinds
-        take([x for x in pool if x['kind'] == kind], n)
+        have = sum(1 for x in picked if x['kind'] == kind)
+        take([x for x in pool if x['kind'] == kind], n - have)
+    for src, n in b.get('min_per_source', {}).items():                                # 1b) no single site dominates
+        have = sum(1 for x in picked if x['source'] == src)
+        take([x for x in pool if x['source'] == src], n - have)
     for g in GROUPS:                                                                  # 2) interest groups
         have = sum(1 for x in picked if g in groups_of(x))
         if have < b['min_per_group']:
@@ -580,13 +655,20 @@ def selftest():
     check(len(ws) >= 10 and any('과학' in r['cats'] or '공학' in r['cats'] for r in ws), f'wevity 과학/공학 category list parses ({len(ws)} rows)')
     lc = link_list(fixture('link_cat_list.html.gz'))
     check(len(lc) >= 10 and all(isinstance(x[2], dt.date) for x in lc), f'linkareer category list parses ids + close dates ({len(lc)})')
+    al = allcon_list(fixture('allcon_list.json.gz'))
+    check(len(al) >= 10 and all(r['srl'].isdigit() and r['end'] for r in al), f'all-con 문학·학술 JSON list parses ({len(al)} rows)')
+    av = allcon_view(fixture('allcon_view.html.gz'))
+    check(bool(av and av['title'] and av['end'] and av['target'] and av['poster'].startswith('https://') and '학술' not in av['cats']),
+          'all-con detail parses, and its broad 학술 categories are reduced to the subject')
+    check(allcon_list('not json') == [] and allcon_view('<html></html>') is None, 'all-con: bad input parses to nothing')
     mv = fixture('majors_view.html.gz')
     mparsed = think_view(mv) or wevity_view(mv) or link_view(mv, MAJORS_FIXTURE_ID)
     check(bool(mparsed and rule_majors(mparsed)), f'majors read from a real detail page ({rule_majors(mparsed) if mparsed else None})')
     pool = [dict(good, id=1000 + i, source=['wevity', 'linkareer'][i % 2], host=f'h{i}', kind=['공모전', '대외활동', '서포터즈', '학술제'][i % 4],
                  tags=[['과학'], ['기획'], ['영상'], ['교육'], ['AI']][i % 5], deadline=iso(TODAY + dt.timedelta(days=5 + i))) for i in range(60)]
     saved = RULES['balance']
-    RULES['balance'] = dict(saved, min_per_kind={k: 7 for k in saved['min_per_kind']}, min_per_group=5, max_per_host=3)
+    plain = dict(saved, min_per_source={}, min_kind_tag={}, min_per_major=0, min_per_tag=0)
+    RULES['balance'] = dict(plain, min_per_kind={k: 7 for k in saved['min_per_kind']}, min_per_group=5, max_per_host=3)
     try: picked = balance(pool, 30)
     finally: RULES['balance'] = saved
     check(len(picked) == 30 and all(sum(1 for x in picked if x['kind'] == k) >= 7 for k in ('공모전', '대외활동', '서포터즈', '학술제'))
@@ -594,7 +676,7 @@ def selftest():
     # a rare group with the latest deadlines still reaches min_per_group
     rare = [dict(good, id=2000 + i, source='wevity', host=f'r{i}', kind=['공모전', '대외활동', '서포터즈', '학술제'][i % 4],
                  tags=['과학'] if i >= 36 else ['기획'], deadline=iso(TODAY + dt.timedelta(days=5 + i))) for i in range(40)]
-    RULES['balance'] = dict(saved, min_per_kind={k: 5 for k in saved['min_per_kind']}, min_per_group=2, min_per_tag=0, max_per_host=3)
+    RULES['balance'] = dict(plain, min_per_kind={k: 5 for k in saved['min_per_kind']}, min_per_group=2, max_per_host=3)
     try: picked = balance(rare, 22)
     finally: RULES['balance'] = saved
     check(sum(1 for x in picked if '과학' in x['tags']) >= 2, 'balance: min_per_group lifts a rare, late group')
@@ -604,6 +686,9 @@ def selftest():
     a = dict(base, url='https://linkareer.com/activity/1', source='linkareer', title='[테스트] 2026 대학생 데이터 분석 아이디어 공모전')
     d, dwhy = dedupe([dict(base), a], curated=[])
     check(len(d) == 1 and d[0]['source'] == 'linkareer', 'dedupe keeps one copy across sources')
+    d, _ = dedupe([dict(base, title='2027 포스텍 SF 어워드'), dict(base, url='https://linkareer.com/activity/2', source='linkareer', title='포스텍 2027 SF 어워드')], curated=[])
+    check(len(d) == 1, 'dedupe: same words in another order are one listing')
+    check(not keep(dict(base, title='참여자 모집'), Counter()) and not keep(dict(base, title='2027 대산장학생 모집'), Counter()), 'filter drops vague titles and scholarships')
     d, dwhy = dedupe([dict(base)], curated=[norm_title(base['title'])])
     check(d == [] and dwhy['curated in ACTIVITIES'] == 1, 'curated ACTIVITIES titles are skipped')
     check(stable_id(base['url']) == stable_id(base['url']) >= 1000, 'id is stable and >= 1000')
@@ -627,7 +712,8 @@ def main():
     if a.selftest: return selftest()
 
     f = Fetcher(a.cache, offline=a.offline)
-    controls = {'wevity': WEVITY, 'thinkcontest': THINK + '/thinkgood/user/contest/index.do', 'linkareer': LINK + '/list/activity'}
+    controls = {'wevity': WEVITY, 'thinkcontest': THINK + '/thinkgood/user/contest/index.do', 'linkareer': LINK + '/list/activity',
+                'allcon': ALLCON + '/list/contest/1'}
     control_ok = {s: bool(f.get(u)) for s, u in controls.items()}
     print('control pages:', control_ok)
 
@@ -639,7 +725,7 @@ def main():
         print(f'{name}: {len(got)} detail pages parsed', flush=True)
         return name, got
     raw, per_source = [], {}
-    sources = (('linkareer', sweep_link), ('wevity', sweep_wevity), ('thinkcontest', sweep_think))
+    sources = (('linkareer', sweep_link), ('wevity', sweep_wevity), ('thinkcontest', sweep_think), ('allcon', sweep_allcon))
     with ThreadPoolExecutor(len(sources)) as ex:     # one thread per site; the per-host lock keeps 2 s spacing
         for name, got in ex.map(lambda x: run(*x), sources):
             per_source[name] = len(got); raw += got

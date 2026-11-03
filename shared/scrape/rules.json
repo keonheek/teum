@@ -20,9 +20,9 @@
     "only_minor": "청소년|어린이|초등|중학생|고등학생|유아"
   },
   "exclude_title": {
-    "_doc": "Dropped before scoring: ads, paid courses, one-off events (forums, tours, talks), political party recruiting, job postings. `match_cats` applies the same drop to the site's own category names.",
+    "_doc": "Dropped before scoring: ads, paid courses, one-off events (forums, tours, talks), political party recruiting, job postings, scholarships, races and event pre-registrations. A title with fewer than 5 letters left after normalising (e.g. just \"참여자 모집\") is dropped too. `match_cats` applies the same drop to the site's own category names.",
     "match_cats": "강연|세미나|박람회",
-    "match": "이벤트|할인|출간보장|책쓰기|교정 서비스|교정의 신|수강생|강의 ?모집|정당|더불어민주당|국민의힘|조국혁신당|개혁신당|진보당|대학생위원회|채용|인턴십 모집|아르바이트|알바|배우 모집|오디션|포럼|투어|설명회|세미나|웨비나|토크콘서트|특강|시니어|교육생|테스터"
+    "match": "이벤트|할인|출간보장|책쓰기|교정 서비스|교정의 신|수강생|강의 ?모집|정당|더불어민주당|국민의힘|조국혁신당|개혁신당|진보당|대학생위원회|채용|인턴십 모집|아르바이트|알바|배우 모집|오디션|포럼|투어|설명회|세미나|웨비나|토크콘서트|특강|시니어|교육생|테스터|장학생|장학금|마라톤|레이스|런\\s*$|사전등록|컨페어"
   },
   "tags": {
     "_doc": "관심 분야, the 22 interests of INTEREST_GROUPS in app/data.js. Matched over title + the site's own category names. Each row counts its hits; a listing keeps the 3 tags with the most hits (ties: the one appearing earlier in the title). Short Latin words (AI, IT, SW, IR) only match as whole words.",
@@ -242,16 +242,30 @@
     "long_term_days": 90
   },
   "balance": {
-    "_doc": "Cap and mix of the final feed. 1) every kind gets min_per_kind; 2) every interest group gets min_per_group (an item counts toward each group its tags touch); 3) every interest tag gets min_per_tag where that many exist; 4) the rest is filled round-robin across interest groups. Inside each step sources alternate and earlier deadlines go first. No host appears more than max_per_host times.",
+    "_doc": "Cap and mix of the final feed, filled in this order: 0) up to min_per_major listings per major that target one (they are rare); 0b) min_kind_tag, e.g. 학술제 for 과학, 공학, 인문; 1) every kind gets min_per_kind; 1b) every source gets min_per_source; 2) every interest group gets min_per_group (an item counts toward each group its tags touch); 3) every interest tag gets min_per_tag where that many exist; 4) the rest is filled round-robin across interest groups. Inside each step sources alternate and earlier deadlines go first. No host appears more than max_per_host times.",
     "cap": 180,
+    "min_per_major": 3,
+    "min_kind_tag": {
+      "학술제": {
+        "과학": 3,
+        "공학": 3,
+        "인문": 3
+      }
+    },
     "min_per_kind": {
       "공모전": 25,
       "대외활동": 25,
       "서포터즈": 25,
       "학술제": 25
     },
+    "min_per_source": {
+      "linkareer": 25,
+      "wevity": 25,
+      "thinkcontest": 25,
+      "allcon": 15
+    },
     "min_per_group": 20,
-    "min_per_tag": 4,
+    "min_per_tag": 6,
     "max_per_host": 3,
     "min_days_left": 1
   },
