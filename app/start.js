@@ -101,7 +101,7 @@ function start_paintMatch(){
   $('#st-cards').innerHTML = list.slice(0, START_TOP).map(x => start_card(x, start_why(x, gaps))).join('');
   $('#st-empty').hidden = !!n;
   $('#st-jump').textContent = `매칭 ${n}개 보기`;
-  start_paintHave(); start_paintTop(list, basis, n);
+  start_paintHave(); start_paintTop(list, n);
   $('#st-gaps').innerHTML = !store.job ? '지원 직무를 고르면 경험창고 기준으로 부족한 역량을 알려 줍니다'
     : gaps.length ? `경험창고 기준 부족한 역량: <b>${esc(gaps.join(', '))}</b> <a class="go" href="#me">경험창고 보기</a>`
     : `${esc(store.job)} 직무가 요구하는 역량은 경험창고에 모두 있습니다 <a class="go" href="#me">경험창고 보기</a>`;
@@ -116,12 +116,12 @@ function start_paintHave(){
     <div class="st-have-act"><button type="button" class="btn ghost sm" data-stadd>경험 추가</button><button type="button" class="btn ghost sm" data-stimport>Notion에서 붙여넣기</button><a class="go" href="#me">경험창고 보기</a></div>`;
 }
 // 맨 위 요약 한 줄, 포스터 모자이크(펼쳐지는 층), 포스터 띠(가운데가 커지는 띠). 움직임 스위치가 꺼져 있으면 CSS가 모자이크와 띠를 숨깁니다
-function start_paintTop(list, basis, n){
+function start_paintTop(list, n){
   const demo = start_demoKey(), p = start_prof();
-  $('#st-hero-sum').textContent = `${demo ? `예시 학생 ${start_label(demo)}` : '내 정보'}. 기존 경험 ${store.exps.length}개, 목표 직무 ${store.job || '미정'}${p.majorGroup ? `, ${p.majorGroup} 계열` : ''}. 열린 활동 ${n}개를 매칭 점수순으로 보여줍니다`;
+  $('#st-hero-sum').textContent = `${demo ? `예시 학생 ${start_label(demo)}` : '내 정보'}. 기존 경험 ${store.exps.length}개, 목표 직무 ${store.job || '미정'}${p.majorGroup ? ` (${p.majorGroup} 계열)` : ''}. 열린 활동 ${n}개를 매칭 점수순으로 보여줍니다`;
   const pics = list.filter(x => actSafe(x.it.poster)).slice(0, 8);
   $('#st-mosaic').innerHTML = pics.map(x => `<img src="${esc(x.it.poster)}" alt="" loading="lazy" onerror="this.remove()">`).join('');
-  $('#st-strip').innerHTML = pics.map((x, i) => `<a class="st-strip-i" role="listitem" href="${link.acts('', x.it.id)}" data-stcard="${x.it.id}" aria-label="${i + 1}위 ${esc(x.it.title)}, 매칭 점수 ${x.ev.score}"><img src="${esc(x.it.poster)}" alt="" loading="lazy" onerror="this.parentNode.remove()"></a>`).join('');
+  $('#st-strip').innerHTML = pics.map((x, i) => `<li><a class="st-strip-i" href="${link.acts('', x.it.id)}" data-stcard="${x.it.id}" aria-label="${i + 1}위 ${esc(x.it.title)}, 매칭 점수 ${x.ev.score}"><img src="${esc(x.it.poster)}" alt="" loading="lazy" onerror="this.closest('li').remove()"></a></li>`).join('');
 }
 // 답이 바뀌면 저장하고 매칭을 자리 이동과 함께 다시 그립니다. 점수 굴리기(countUp)는 한 번 그릴 때 한 번만 부릅니다 (paint도 부르므로 start_paintMatch 안에서는 부르지 않습니다)
 function start_answer(){ save(); start_sync(); start_syncLeft(); morph(() => { start_paintMatch(); renderNext(); nameThumbs(); countUp(); }); }
@@ -225,7 +225,7 @@ function renderStart(){
       <details class="st-rules"><summary>매칭 점수 계산 방법</summary>
         <p>활동 추천과 같은 식(직무 적합 50, 관심 분야 10, 일정 15, 시간 부담 15, 마감 여유 10)으로 매칭 점수를 내고, 아래 가산점과 감점을 더한 값으로 줄을 세웁니다. 마감이 지난 활동은 뺍니다</p>
         <ul>${START_RULES.map(r => `<li><b class="${r.pts < 0 ? 'minus' : ''}">${esc(r.label)} ${r.pts > 0 ? '+' : ''}${r.pts}</b> ${esc(r.rule)}</li>`).join('')}</ul></details>
-      <div class="st-strip" id="st-strip" role="list" aria-label="매칭 상위 8개 포스터"></div>
+      <ul class="st-strip" id="st-strip" aria-label="매칭 상위 8개 포스터"></ul>
       <ol class="st-cards" id="st-cards"></ol>
       <p class="st-empty" id="st-empty" hidden>조건에 맞는 열린 활동이 없습니다. <button type="button" class="linkbtn" data-streset>종류와 온라인 조건 풀기</button></p>
     </section>

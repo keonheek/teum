@@ -87,3 +87,51 @@
 @media (prefers-reduced-motion:reduce){
   .st-card{animation:none;translate:none}
 }
+
+/* 사용자 정보 입력 첫 칸: 기존 경험과 보유 역량 */
+.st-have{background:var(--soft);border-radius:var(--r-ctl);padding:12px 14px}
+.st-have p{margin:0 0 4px;font-size:13px;color:var(--ink2);line-height:1.5}
+.st-have b{color:var(--ink);font-weight:700}
+.st-have-act{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-top:8px}
+
+/* 맨 위: 기본은 제목과 요약 한 줄. 펼쳐지는 층(m-unfold)을 켜면 포스터 모자이크가 든 시트가 되고, 스크롤해 화면을 벗어나는 동안 좌우 16px 여백이 0으로 펼쳐집니다 */
+.st-hero-sum{margin:-10px 0 18px;font-size:13px;color:var(--ink3);line-height:1.5}
+.st-mosaic{display:none}
+html.m-unfold .st-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,46%);align-items:stretch;background:#fff;border-radius:var(--r-panel);box-shadow:var(--shadow-card);margin:16px 16px 28px;overflow:hidden;view-timeline-name:--st-hero}
+html.m-unfold .st-hero-t{order:-1;padding:22px 24px;align-self:center}
+html.m-unfold .st-hero .view-h{padding:0 0 8px}
+html.m-unfold .st-hero-sum{margin:0}
+html.m-unfold .st-mosaic{display:block;min-height:160px;overflow:hidden;position:relative}
+/* 포스터 5장(좁은 화면 4장)이 너비를 나눠 가집니다. 모자이크 칸이 넘치는 부분을 잘라 냅니다 */
+.st-mosaic-in{position:absolute;inset:0;display:flex;gap:6px;transform-origin:center}
+.st-mosaic-in img{flex:1 1 0;min-width:0;height:100%;object-fit:cover}
+.st-mosaic-in img:nth-child(n+6){display:none}
+@supports (animation-timeline: view()){
+  @keyframes st-unfold{from{margin-inline:16px}to{margin-inline:0}}
+  @keyframes st-mosaic{from{scale:1.1}to{scale:1}}
+  html.m-unfold .st-hero{animation:st-unfold linear both;animation-timeline:--st-hero;animation-range:exit 0% exit 60%}
+  html.m-unfold .st-mosaic-in{animation:st-mosaic linear both;animation-timeline:--st-hero;animation-range:exit 0% exit 60%}
+}
+
+/* 포스터 띠(m-strip): 매칭 상위 8개를 가로로 넘겨 보고, 가운데 온 포스터가 커집니다. 띠에는 글자가 없어 흐림이 대비 검사에 걸리지 않습니다 */
+.st-strip{display:none}
+html.m-strip .st-strip{display:flex;list-style:none;margin:0 0 20px;padding:12px calc(50% - 90px);gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
+html.m-strip .st-strip::-webkit-scrollbar{display:none}
+.st-strip li{flex:none;width:180px;scroll-snap-align:center}
+.st-strip-i{display:block;aspect-ratio:3/4;border-radius:var(--r-panel);overflow:hidden;background:var(--soft);box-shadow:var(--shadow-card)}
+.st-strip-i img{display:block;width:100%;height:100%;object-fit:cover}
+@supports (animation-timeline: view()){
+  @keyframes st-strip{0%,100%{scale:.9;opacity:.6}50%{scale:1.04;opacity:1}}
+  html.m-strip .st-strip li{animation:st-strip linear both;animation-timeline:view(inline)}
+}
+@media (max-width:760px){
+  html.m-unfold .st-hero{grid-template-columns:minmax(0,1fr);margin:12px 16px 20px}
+  html.m-unfold .st-hero-t{order:0;padding:16px}
+  html.m-unfold .st-mosaic{min-height:120px}
+  .st-mosaic-in img:nth-child(n+5){display:none}
+  html.m-strip .st-strip{padding-inline:calc(50% - 65px);gap:10px}
+  .st-strip li{width:130px}
+}
+@media (prefers-reduced-motion:reduce){
+  html.m-unfold .st-hero,html.m-unfold .st-mosaic-in,html.m-strip .st-strip li{animation:none}
+}
