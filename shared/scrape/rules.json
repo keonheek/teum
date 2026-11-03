@@ -1,0 +1,324 @@
+{
+  "_doc": "틈 sweeper rule table. Every value in feed.js that is not copied from a listing comes from here. Matching is a case-insensitive regex search over the listing's title + source categories + target text. Order matters where noted. See README.md.",
+  "today": "2026-11-03",
+  "kind": {
+    "_doc": "First match wins, top to bottom. A listing that matches nothing keeps its source section's kind (공모전 section -> 공모전, 대외활동 section -> 대외활동).",
+    "rules": [
+      {
+        "kind": "학술제",
+        "match": "학술제|학술대회|학술 ?공모|논문|학회|리포트|심포지엄|컨퍼런스|연구 ?발표|학술"
+      },
+      {
+        "kind": "서포터즈",
+        "match": "서포터즈|앰버서더|앰배서더|홍보대사|크루|서포터"
+      }
+    ]
+  },
+  "eligible": {
+    "_doc": "open to 대학생: the listing's target text (응모대상 / 참가자격 / targets) must match `allow`, and a target text that matches `only_minor` without matching `allow` is dropped. Empty target text = kept as 확인 필요 only for linkareer, whose list is 대학생-only by site scope.",
+    "allow": "대학생|대학\\(원\\)생|대학원생|재학생|휴학생|제한 ?없음|누구나|일반인|청년|전 ?국민|국민 누구나",
+    "only_minor": "청소년|어린이|초등|중학생|고등학생|유아"
+  },
+  "exclude_title": {
+    "_doc": "Dropped before scoring: ads, paid courses, one-off events (forums, tours, talks), political party recruiting, job postings. `match_cats` applies the same drop to the site's own category names.",
+    "match_cats": "강연|세미나|박람회",
+    "match": "이벤트|할인|출간보장|책쓰기|교정 서비스|교정의 신|수강생|강의 ?모집|정당|더불어민주당|국민의힘|조국혁신당|개혁신당|진보당|대학생위원회|채용|인턴십 모집|아르바이트|알바|배우 모집|오디션|포럼|투어|설명회|세미나|웨비나|토크콘서트|특강|시니어|교육생|테스터"
+  },
+  "tags": {
+    "_doc": "관심 분야, the 22 interests of INTEREST_GROUPS in app/data.js. Matched over title + the site's own category names. Each row counts its hits; a listing keeps the 3 tags with the most hits (ties: the one appearing earlier in the title). Short Latin words (AI, IT, SW, IR) only match as whole words.",
+    "groups": {
+      "비즈니스": [
+        "기획",
+        "마케팅",
+        "금융",
+        "창업"
+      ],
+      "데이터와 IT": [
+        "데이터",
+        "개발",
+        "AI"
+      ],
+      "크리에이티브": [
+        "콘텐츠",
+        "영상",
+        "디자인",
+        "글쓰기",
+        "문화예술"
+      ],
+      "과학과 공학": [
+        "과학",
+        "공학",
+        "환경",
+        "보건의료"
+      ],
+      "사회와 사람": [
+        "정책",
+        "교육",
+        "인문",
+        "글로벌",
+        "봉사",
+        "ESG",
+        "스포츠"
+      ]
+    },
+    "max": 3,
+    "rules": [
+      {
+        "tag": "기획",
+        "match": "기획|아이디어|제안|PM/PO"
+      },
+      {
+        "tag": "마케팅",
+        "match": "마케팅|마케터|광고|홍보|브랜드|브랜딩|네이밍|슬로건|SNS|서포터즈|앰버서더|앰배서더"
+      },
+      {
+        "tag": "금융",
+        "match": "금융|경제|투자|증권|은행|보험|재정|핀테크|회계|세무|자산|연금|조세"
+      },
+      {
+        "tag": "창업",
+        "match": "창업|스타트업|(?<![A-Za-z])IR(?![A-Za-z])|비즈니스 ?모델|사업화|벤처|취업/창업|소상공인"
+      },
+      {
+        "tag": "데이터",
+        "match": "데이터|분석|통계|빅데이터|시각화"
+      },
+      {
+        "tag": "개발",
+        "match": "개발|소프트웨어|(?<![A-Za-z])SW(?![A-Za-z])|앱|웹/모바일|해커톤|코딩|프로그래밍|게임|(?<![A-Za-z])IT(?![A-Za-z])|보안|클라우드|메타버스"
+      },
+      {
+        "tag": "AI",
+        "match": "(?<![A-Za-z])AI(?![A-Za-z])|인공지능|머신러닝|딥러닝|(?<![A-Za-z])GPT|생성형|(?<![A-Za-z])LLM(?![A-Za-z])"
+      },
+      {
+        "tag": "콘텐츠",
+        "match": "콘텐츠|블로그|기자단|에디터|크리에이터|카드뉴스|웹툰|만화|인스타|유튜버"
+      },
+      {
+        "tag": "영상",
+        "match": "영상|UCC|숏폼|쇼츠|유튜브|영화|뮤직비디오|필름|릴스"
+      },
+      {
+        "tag": "디자인",
+        "match": "디자인|일러스트|로고|굿즈|포스터|캐릭터|패션|건축|인테리어|공예|시각|이모티콘"
+      },
+      {
+        "tag": "글쓰기",
+        "match": "글쓰기|수기|에세이|시나리오|문학|소설|백일장|독후감|논술|칼럼|카피|작문|기사|글/|편지|시조"
+      },
+      {
+        "tag": "문화예술",
+        "match": "문화|예술|음악|미술|전시|공연|페스티벌|축제|무용|연극|사진|예체능|국악|밴드|노래|작곡"
+      },
+      {
+        "tag": "과학",
+        "match": "과학|생물|생명|화학|물리|수학|천문|자연|기상|해양|지구|실험|과학/공학"
+      },
+      {
+        "tag": "공학",
+        "match": "공학|기술|발명|특허|로봇|반도체|전기|기계|건설|자동차|드론|항공|우주|ICT|원자력|에너지|모빌리티|과학/공학"
+      },
+      {
+        "tag": "환경",
+        "match": "환경|기후|탄소|생태|친환경|재활용|자원순환|토양|숲|산림|해양|플라스틱|에너지 ?전환|업사이클"
+      },
+      {
+        "tag": "보건의료",
+        "match": "보건|의료|건강|병원|간호|의약|제약|복지|금연|정신건강|헬스케어|바이오|식품|영양|진료|재난|안전"
+      },
+      {
+        "tag": "정책",
+        "match": "정책|행정|공공|정부|규제|입법|시정|도정|지자체|의회|국정|청년정책|민원"
+      },
+      {
+        "tag": "교육",
+        "match": "교육|멘토링|멘토|강사|튜터|학습|교사|학교|과외|교육봉사"
+      },
+      {
+        "tag": "인문",
+        "match": "인문|역사|철학|한국어|한글|독서|고전|언어|문화유산|기록|민속|고고"
+      },
+      {
+        "tag": "글로벌",
+        "match": "글로벌|해외|국제|외국어|영어|중국어|일본어|유학|교류|외국인|통역|번역|세계"
+      },
+      {
+        "tag": "봉사",
+        "match": "봉사|자원봉사|봉사단|나눔|기부|사회공헌"
+      },
+      {
+        "tag": "ESG",
+        "match": "ESG|지속가능|사회적 ?가치|사회적기업|인권|평화|윤리|공정|상생|탄소중립|기후"
+      },
+      {
+        "tag": "스포츠",
+        "match": "스포츠|체육|운동|러닝|마라톤|축구|야구|농구|e스포츠|태권도|요가|골프|자전거|올림픽|체력"
+      }
+    ],
+    "fallback_by_kind": {
+      "공모전": [
+        "기획"
+      ],
+      "대외활동": [
+        "기획"
+      ],
+      "서포터즈": [
+        "마케팅",
+        "콘텐츠"
+      ],
+      "학술제": [
+        "기획"
+      ]
+    }
+  },
+  "builds": {
+    "_doc": "역량 the activity adds to 경험창고 (8 NCS-style: 리더십, 문제해결, 협업, 도전, 데이터, 고객, 의사소통, 직업윤리). Keyword rows first (row order), then the kind's base list fills up to max. No duplicates.",
+    "max": 3,
+    "rules": [
+      {
+        "build": "데이터",
+        "match": "데이터|분석|AI|인공지능|통계|빅데이터|논문|리포트|연구"
+      },
+      {
+        "build": "리더십",
+        "match": "리더|회장|운영진|운영단|기획단|단장|팀장|임원"
+      },
+      {
+        "build": "협업",
+        "match": "팀|해커톤|캠프|조별|공동|연합"
+      },
+      {
+        "build": "고객",
+        "match": "마케팅|고객|홍보|소비자|서비스|광고|브랜드|서포터즈|앰버서더|앰배서더|SNS"
+      },
+      {
+        "build": "도전",
+        "match": "창업|챌린지|도전|AI 영상|숏폼|IR|스타트업"
+      },
+      {
+        "build": "문제해결",
+        "match": "정책|아이디어|해결|제안|개선|혁신"
+      },
+      {
+        "build": "의사소통",
+        "match": "기자단|발표|스피치|토론|홍보|SNS|콘텐츠|인터뷰|설명회|PT|프레젠테이션|논술|에디터|크리에이터|블로그"
+      },
+      {
+        "build": "직업윤리",
+        "match": "기자단|봉사|월간|정기|매월|매주|기수"
+      }
+    ],
+    "base_by_kind": {
+      "공모전": [
+        "문제해결",
+        "도전"
+      ],
+      "대외활동": [
+        "협업",
+        "직업윤리"
+      ],
+      "서포터즈": [
+        "고객",
+        "의사소통",
+        "직업윤리"
+      ],
+      "학술제": [
+        "데이터",
+        "문제해결",
+        "의사소통"
+      ]
+    }
+  },
+  "hours": {
+    "_doc": "주당 부담 (hours/week) is a rule estimate, never read from a listing. base_by_kind, then: a 공모전/학술제 whose 접수 window is 14 days or less gets +1 (crunch); a 대외활동/서포터즈 whose activity term is 3 months or longer gets +1 (sustained load). Clamped to 1..8.",
+    "base_by_kind": {
+      "공모전": 3,
+      "대외활동": 4,
+      "서포터즈": 4,
+      "학술제": 4
+    },
+    "short_window_days": 14,
+    "long_term_days": 90
+  },
+  "balance": {
+    "_doc": "Cap and mix of the final feed. 1) every kind gets min_per_kind; 2) every interest group gets min_per_group (an item counts toward each group its tags touch); 3) every interest tag gets min_per_tag where that many exist; 4) the rest is filled round-robin across interest groups. Inside each step sources alternate and earlier deadlines go first. No host appears more than max_per_host times.",
+    "cap": 180,
+    "min_per_kind": {
+      "공모전": 25,
+      "대외활동": 25,
+      "서포터즈": 25,
+      "학술제": 25
+    },
+    "min_per_group": 20,
+    "min_per_tag": 4,
+    "max_per_host": 3,
+    "min_days_left": 1
+  },
+  "unknown": "확인 필요",
+  "majors": {
+    "_doc": "majors = MAJORS keys from app/data.js, set only when a listing targets or restricts majors. Read from the target field plus the detail lines that talk about eligibility (`context`). A stem counts only when a major word (`suffix`: 학과, 전공, 계열, 학부; never a bare 대학생/재학생, which every listing says) follows it within 14 characters (not across a comma or a line break), so a 간호 topic is not a 간호학과 restriction. `exact` rows need no suffix. A match followed within 20 characters by `negated_by` (제외, 불가 ...) is an exclusion, not a target, and is ignored. `any_major` (전공 무관 ...) clears the list. Otherwise majors = [].",
+    "context": "자격|대상|지원 ?가능|참가 ?가능|참여 ?가능|신청 ?가능|재학생|휴학생|전공자|계열",
+    "suffix": "학과|전공|계열|학부",
+    "any_major": "전공 ?(무관|불문|제한 ?없|상관 ?없)|모든 전공|전공에 관계|학과 ?무관|학과 ?제한 ?없",
+    "negated_by": "제외|불가|지원할 수 없|참가할 수 없|제한",
+    "rules": [
+      {
+        "major": "경영, 경제",
+        "stem": "경영|경제|회계|상경|경상|무역|국제통상|금융"
+      },
+      {
+        "major": "인문",
+        "stem": "인문|국문|국어국문|어문|영문|영어영문|사학|철학|문헌정보|외국어|역사|사학과|고고|문화인류"
+      },
+      {
+        "major": "사회과학",
+        "stem": "사회과학|행정|정치외교|정치|사회학|심리|미디어커뮤니케이션|신문방송|언론|사회복지|법학|지리"
+      },
+      {
+        "major": "컴퓨터, IT",
+        "stem": "컴퓨터|소프트웨어|정보통신|인공지능|전산|정보보호|데이터사이언스|SW"
+      },
+      {
+        "major": "공학",
+        "stem": "공학|공과|기계|전자|전기|화학공학|신소재|건축|토목|산업공학|조선|원자력|에너지"
+      },
+      {
+        "major": "자연과학",
+        "stem": "자연과학|이학|생명과학|생물|화학|물리|수학|통계|지구과학|천문"
+      },
+      {
+        "major": "의약, 보건",
+        "stem": "간호|약학|의학|의과|의대|보건|식품영양|치의|한의|수의|임상병리|물리치료|방사선"
+      },
+      {
+        "major": "예체능, 디자인",
+        "stem": "디자인|미술|음악|체육|무용|영상|연극영화|예술|실용음악|패션|조형|공예|만화애니"
+      },
+      {
+        "major": "교육",
+        "stem": "교육학|사범|교육대학|교대|유아교육|국어교육|수학교육|영어교육|교직"
+      },
+      {
+        "major": "공학",
+        "stem": "이공계|이공 ?계열|이공대",
+        "exact": true
+      },
+      {
+        "major": "자연과학",
+        "stem": "이공계|이공 ?계열|이공대",
+        "exact": true
+      },
+      {
+        "major": "의약, 보건",
+        "stem": "의료계열|보건계열|간호대",
+        "exact": true
+      },
+      {
+        "major": "예체능, 디자인",
+        "stem": "예체능 ?계열|미대|음대|예대",
+        "exact": true
+      }
+    ]
+  }
+}

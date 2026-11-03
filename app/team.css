@@ -1,0 +1,134 @@
+/* 팀원 모집 화면 전용 스타일. 공통 토큰과 컴포넌트는 app.css에 있습니다 */
+
+/* 떠 있는 층: 바닥(canvas) 위의 묶음은 모두 흰 시트로 띄웁니다. 시트 안의 옅은 채움은 괜찮고, 바닥에 바로 놓인 테두리나 회색 판은 쓰지 않습니다 */
+#view-team :is(.rail,.my-status,.mine-panel,.ctx,#post-form,.empty){background:#fff;border-radius:var(--r-panel);box-shadow:var(--shadow-card)}
+
+/* 레일: 떠 있는 시트, 줄 구분선 없이 눌린 칸만 채움 */
+#view-team .rail{top:72px;padding:16px 10px 14px}
+#view-team .rail h2{font-size:13px;color:var(--ink2);margin:0 6px 8px}
+#view-team .rail .rail-list{border-top:0;margin:0 0 12px}
+#view-team .rail .rail-list button{border-bottom:0;border-radius:var(--r-ctl);padding:9px 10px}
+@media (hover:hover) and (pointer:fine){#view-team .rail .rail-list button:hover{background:var(--soft)}}
+#view-team .rail .rail-list button[aria-pressed="true"]{background:var(--accentwash)}
+#view-team .rail-note{margin:0 6px}
+
+/* 제목 아래 2단계 미리보기 한 줄: 배지 없이 글자만 (바닥 위라 대비를 위해 ink2) */
+#view-team .view-h .team-phase{flex-basis:100%;color:var(--ink2);font-size:14px}
+
+/* 제목 순서(h1 > h2 > h3)를 맞추되 보이는 모양은 그대로 */
+#view-team .team-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+
+/* 내 지원 현황: 맨 위에 뜬 시트. 안의 줄은 구분선 없이 마우스를 올리면 옅게 채움 */
+#view-team .my-status{margin:0 0 20px;padding:16px 14px 12px;box-shadow:var(--shadow-float)}
+#view-team .my-status h2{margin-left:8px}
+#view-team .my-status h3{margin-left:8px}
+#view-team .my-status h2{font-size:15px;margin:0 0 10px}
+#view-team .my-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px 28px}
+#view-team .my-rows{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+#view-team .my-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center;width:100%;min-height:44px;text-align:left;border:0;border-radius:var(--r-ctl);background:none;padding:9px 8px;font:inherit;color:var(--ink);cursor:pointer;line-height:1.4;transition-property:background-color,scale;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+@media (hover:hover) and (pointer:fine){#view-team .my-row:hover{background:var(--soft)}}
+#view-team .my-row:active{scale:.995}
+#view-team .my-row[aria-current="true"]{background:var(--accentwash)}
+#view-team .my-row[aria-current="true"] b{color:var(--accent)}
+#view-team .my-t b{display:block;font-size:14px;overflow-wrap:anywhere}
+#view-team .my-t small{display:block;font-size:12px;color:var(--ink3);margin-top:1px}
+#view-team .my-s{font-size:13px;font-weight:600;color:var(--ink3);white-space:nowrap}
+#view-team .my-s.warn{color:var(--warn)}
+
+/* 원하는 역량과 내 경험 */
+#view-team .want-cover{list-style:none;margin:0 0 6px;padding:0;font-size:13px;line-height:1.5}
+#view-team .want-cover li{display:grid;grid-template-columns:4.5em minmax(0,1fr);gap:2px 10px;padding:6px 0;border-bottom:1px solid var(--grid)}
+#view-team .want-cover li b{color:var(--ink)}
+#view-team .want-cover .ok{color:var(--ink2)}
+#view-team .want-cover .miss{color:var(--bad)}
+#view-team .want-cover .go{grid-column:2;justify-self:start;padding:2px 0}
+#view-team .cover-sum{margin:0 0 14px;font-size:13px;color:var(--ink2)}
+#view-team .team-exp{color:var(--accent);font-weight:700;text-decoration:underline;text-decoration-color:var(--accentline);text-underline-offset:3px;transition-property:text-decoration-color;transition-duration:150ms}
+#view-team .team-exp:hover{text-decoration-color:var(--accent)}
+#view-team .shared{margin:0 0 12px;font-size:13px;color:var(--ink2);line-height:1.6}
+
+/* 지원 뒤 다음 단계 */
+#view-team .next-step{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;background:var(--soft);border-radius:var(--r-ctl);padding:10px 12px;margin:12px 0 0;font-size:13px;line-height:1.5;color:var(--ink2)}
+#view-team .next-step > span{flex:1 1 220px}
+
+/* 입력 검사 */
+#view-team .field-err{margin:-4px 0 10px;font-size:13px;line-height:1.45;color:var(--bad)}
+#view-team .sub-form .chips + .field-err{margin-top:-2px}
+#view-team .sub-form [aria-invalid="true"]{border-color:var(--bad)}
+#view-team .want-hint{margin:-2px 0 8px}
+
+/* 활동 맥락 줄, 쓰기 폼, 빈 목록: 바닥 위에서는 흰 시트 */
+#view-team .ctx{padding:14px 16px}
+#view-team #post-form{padding:18px 18px 16px;margin:0 0 14px;box-shadow:var(--shadow-float)}
+#view-team #post-form .pick-list{background:var(--soft);border-radius:var(--r-ctl);padding:2px 12px}
+#view-team #post-form .pick-exp:last-child{border-bottom:0}
+#view-team .empty{padding:28px 22px}
+#view-team .empty p{margin:0 0 10px}
+#view-team button.go{min-height:32px}
+#view-team .post-act .btn{min-height:30px}
+
+/* 접힌 줄: 맡을 역할, 작성자 경험, 매칭 세 부분 */
+#view-team .post-peek,#view-team .post-why{display:flex;flex-wrap:wrap;gap:2px 14px;font-size:13px;line-height:1.5;margin-top:4px}
+#view-team .post-peek{color:var(--ink2)}
+#view-team .post-peek b{font-weight:600;color:var(--ink)}
+#view-team .post-why{color:var(--ink2)}
+#view-team :is(.post-why,.calc) .ok{color:var(--ok);font-weight:600}
+#view-team :is(.post-why,.calc) .bad{color:var(--bad);font-weight:600}
+#view-team :is(.post-why,.calc) .dim{color:var(--ink3)}
+
+/* 매칭 계산 */
+#view-team .calc{margin:0 0 14px;font-size:13px;line-height:1.5}
+#view-team .calc > div{display:grid;grid-template-columns:11.5em minmax(0,1fr);gap:2px 12px;padding:6px 0;border-bottom:1px solid var(--grid)}
+#view-team .calc dt{color:var(--ink2);font-weight:600}
+#view-team .calc dd{margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px}
+#view-team .calc dd > span{flex:1 1 220px;color:var(--ink2)}
+#view-team .calc dd > b{font-variant-numeric:tabular-nums;color:var(--ink)}
+
+/* 목록 + 오른쪽 칸 */
+#view-team .board-wrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start}
+#view-team .mine-panel{position:sticky;top:72px;padding:18px 18px 16px}
+#view-team .mine-panel h2{font-size:15px;margin:0 0 6px;line-height:1.4}
+#view-team .mine-panel > .muted{margin:0 0 10px}
+#view-team .mine-exps{list-style:none;margin:0 0 10px;padding:0;font-size:13px;line-height:1.5}
+#view-team .mine-exps li{padding:8px 10px;background:var(--soft);border-radius:var(--r-ctl);margin-bottom:6px}
+#view-team .mine-exps small{display:block;color:var(--ink3);margin-top:2px}
+#view-team .mine-exps .tg{font-size:12px}
+#view-team .mine-miss{display:flex;flex-wrap:wrap;align-items:center;gap:0 14px;margin:0 0 12px;font-size:13px;color:var(--bad)}
+#view-team .mine-panel > .btn{margin:0 0 18px}
+#view-team .calc-key{margin:0;font-size:13px;line-height:1.5}
+#view-team .calc-key div{padding:6px 0}
+#view-team .calc-key div + div{border-top:1px solid var(--grid)}
+#view-team .calc-key dt{color:var(--ink);font-weight:600}
+#view-team .calc-key dd{margin:0;color:var(--ink2)}
+#view-team .calc-more{margin:-6px 0 14px}
+
+/* 내 글: 예시 지원자 순위 */
+#view-team .cand{list-style:none;margin:0 0 14px;padding:0;font-size:13px;line-height:1.5;counter-reset:cand}
+#view-team .cand li{display:grid;gap:1px;padding:8px 0 8px 22px;border-bottom:1px solid var(--grid);position:relative;color:var(--ink2);counter-increment:cand}
+#view-team .cand li::before{content:counter(cand);position:absolute;left:2px;top:8px;font-weight:800;color:var(--accent)}
+#view-team .cand-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;color:var(--ink3)}
+#view-team .cand-h > b:first-child{color:var(--ink);font-size:14px}
+#view-team .cand-pct{margin-left:auto;color:var(--ink)}
+#view-team .cand .ok{color:var(--ok)}
+#view-team .cand .bad{color:var(--bad)}
+#view-team .cand .dim{color:var(--ink3)}
+
+/* 스크롤로 들어올 때 떠오름: 위치와 크기만 바꿉니다 (투명도 없음). 움직임 줄이기에서는 app.css가 모두 끕니다 */
+@supports (animation-timeline: view()){
+  #view-team:not(.enter) :is(.my-status,.empty){animation:sheet-in linear both;animation-timeline:view();animation-range:entry 0% entry 55%}
+}
+
+@media (max-width:1240px){
+  #view-team .board-wrap{grid-template-columns:minmax(0,1fr)}
+  #view-team .mine-panel{position:static;margin-top:14px}
+}
+@media (max-width:1100px){
+  /* 좁은 화면에서는 활동 고르기를 위쪽 선택 상자가 맡으므로 아래 레일은 비어 있습니다 */
+  #view-team .rail{display:none}
+}
+@media (max-width:760px){
+  #view-team .my-row{grid-template-columns:minmax(0,1fr)}
+  #view-team .post-act .btn{flex:1 1 auto}
+  #view-team .pcond{grid-template-columns:minmax(0,1fr)}
+  #view-team .calc > div{grid-template-columns:minmax(0,1fr)}
+}

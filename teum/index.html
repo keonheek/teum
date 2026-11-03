@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>틈으로 이동</title>
+<!-- 예전 주소(/teum/?fill=..&id=..)를 하나로 합친 앱의 활동 추천으로 옮깁니다 -->
+<script>
+const p = new URLSearchParams(location.search);
+const q = [p.get('fill') ? 'fill=' + encodeURIComponent(p.get('fill')) : '', p.get('id') ? 'id=' + encodeURIComponent(p.get('id')) : ''].filter(Boolean).join('&');
+location.replace('../#activities' + (q ? '?' + q : ''));
+</script>
+</head>
+<body><p><a href="../#activities">틈 활동 추천으로 이동</a></p></body>
+</html>

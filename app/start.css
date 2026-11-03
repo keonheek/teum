@@ -1,0 +1,89 @@
+/* 시작 화면 전용 스타일. 공통 토큰과 컴포넌트는 app.css에 있습니다 */
+/* 나란히형 + 떠 있는 층: 캔버스 위에 왼쪽 40% 질문 시트, 오른쪽 60% 포스터 시트들. 질문 시트는 머리 아래에 붙어 있어 아래 질문에 답하면서도 매칭이 보입니다 */
+.st{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,6fr);gap:36px;align-items:start}
+.st-q{position:sticky;top:72px;max-height:calc(100vh - 88px);overflow-y:auto;overscroll-behavior:contain;background:#fff;border-radius:var(--r-panel);box-shadow:var(--shadow-card);padding:20px 20px 18px}
+.st-q .field{margin-bottom:16px}
+.st-who{margin-bottom:6px}
+.st-who button{flex:1}
+.st-who-note{margin:0 0 18px}
+.st-grade button{padding:6px 10px}
+.st-who.many{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:6px}
+.st-who.many button{display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;padding:7px 10px}
+.st-who.many small{font-size:12px;color:var(--ink3);font-weight:400}
+.st-sublbl{display:block;font-size:13px;font-weight:600;color:var(--ink2);margin:12px 0 7px}
+.st-ig + .st-ig{margin-top:10px}
+.st-ig.closed{display:flex;align-items:center;gap:4px 10px;flex-wrap:wrap}
+.st-ig.closed .st-igh{margin:0;min-width:84px}
+.st-ig.closed + .st-ig{margin-top:6px}
+.st-igh,.st-pickh{display:block;font-size:12px;color:var(--ink3);margin-bottom:5px}
+.st-more{align-self:center;padding:4px 6px;font-weight:600}
+.st-jobpicks:not(:empty){margin-top:10px}
+.st-apply{margin:10px 0 0;font-size:13px}
+.st-apply:empty{display:none}
+.st-boost.minus,.st-rules b.minus{color:var(--bad)}
+.st-q input:not([type=checkbox]):not([type=range]),.st-q select{width:100%}
+.st-sub{margin:6px 0 0}
+.st-gaps{font-size:13px;line-height:1.55;color:var(--ink2);margin:4px 0 18px;padding:10px 12px;background:var(--soft);border-radius:var(--r-ctl)}
+.st-gaps b{color:var(--accent);margin-right:6px}
+.st-acts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.st-end .muted{margin:0}
+
+/* 오른쪽 매칭: 포스터마다 흰 시트 한 장 */
+.st-mh{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px;margin-bottom:6px}
+.st-mh h2{margin:0;font-size:17px;font-weight:800}
+.st-rules{font-size:13px;color:var(--ink2);margin-bottom:16px}
+.st-rules summary{cursor:pointer;color:var(--ink3);width:max-content;max-width:100%}
+.st-rules p{margin:8px 0 6px;line-height:1.55}
+.st-rules ul{list-style:none;margin:0;padding:0;display:grid;gap:3px}
+.st-rules b{color:var(--accent);font-weight:700;margin-right:6px}
+.st-cards{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 20px}
+.st-cards > li{view-transition-class:morph;min-width:0;display:flex}
+.st-card{flex:1;display:flex;flex-direction:column;gap:5px;color:var(--ink);text-decoration:none;background:#fff;border-radius:var(--r-panel);box-shadow:var(--shadow-card);overflow:hidden;padding-bottom:14px}
+.st-card > span:not(.st-poster){padding:0 14px}
+.st-poster{position:relative;display:block;flex:none;aspect-ratio:3/4;overflow:hidden;background:var(--soft);margin-bottom:7px}
+.st-poster img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover}
+.st-fb{display:none}
+.st-poster.none .st-fb{display:flex;position:absolute;inset:0;align-items:center;justify-content:center;color:var(--ink3);font-size:14px;font-weight:700}
+.st-title{font-size:15px;font-weight:700;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.st-meta{font-size:13px;color:var(--ink3);line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st-kind{color:var(--accent);font-weight:600}
+.st-num{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px;font-size:13px;margin-top:auto}
+.st-score{color:var(--accent);font-weight:800}
+.st-boost{color:var(--ink2);font-weight:600}
+.st-dd{color:var(--ink2);font-weight:600}
+.st-dd.urgent{color:var(--bad)}
+.st-why{font-size:12.5px;color:var(--ink2);line-height:1.5}
+.st-empty{font-size:14px;color:var(--ink2);padding:24px 0}
+.st-bar{display:none}
+/* 시트는 마우스를 올리면 한 층 떠오릅니다 (app.css의 .post, .exp와 같은 값) */
+@media (hover:hover) and (pointer:fine){
+  .st-card{transition-property:translate,box-shadow;transition-duration:220ms;transition-timing-function:var(--ease-out)}
+  .st-card:hover{translate:0 -2px;box-shadow:var(--shadow-lift)}
+  .st-card:hover .st-title{text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+}
+/* 스크롤: 카드는 화면에 들어올 때 떠오릅니다. 불투명도는 바꾸지 않습니다 (대비 검사가 흐린 글자로 잡지 않도록) */
+@supports (animation-timeline: view()){
+  @keyframes st-rise{from{translate:0 36px;scale:.98}}
+  .view:not(.enter) .st-card{animation:st-rise linear both;animation-timeline:view();animation-range:entry 0% entry 55%}
+}
+
+@media (max-width:1100px){
+  .st{grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:28px}
+  .st-q{top:12px;max-height:calc(100vh - 24px)}
+  .st-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 16px}
+}
+/* 좁은 화면: 질문 시트 아래에 매칭, 아래 바가 매칭으로 바로 내려 줍니다 */
+@media (max-width:760px){
+  .st{grid-template-columns:minmax(0,1fr);gap:28px}
+  .st-q{position:static;max-height:none;overflow:visible;padding:18px 16px 16px}
+  .st-cards{gap:16px 12px}
+  .st-card{padding-bottom:12px}
+  .st-card > span:not(.st-poster){padding:0 10px}
+  .st-title{font-size:14px}
+  #view-start{padding-bottom:64px}
+  .st-bar{display:block;position:fixed;left:0;right:0;bottom:0;z-index:20;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:#fff;box-shadow:0 -8px 24px -14px rgba(29,28,25,.22);transition-property:translate,opacity,visibility;transition-duration:200ms;transition-timing-function:var(--ease-out)}
+  .st-bar.off{translate:0 100%;opacity:0;visibility:hidden;pointer-events:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .st-card{animation:none;translate:none}
+}

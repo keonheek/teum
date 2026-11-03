@@ -1,0 +1,190 @@
+/* 활동 추천 화면 전용 스타일. 공통 토큰과 컴포넌트는 app.css에 있습니다 */
+/* 담기 전후 역량 지도: 경험창고의 역량 지도와 같은 막대 (진한 칸 = 지금, 빗금 = 이 활동, 세로선 = 직무 요구) */
+.delta{margin:14px 0 12px}
+.fillbox .delta-h{font-size:13px;font-weight:700;margin:0 0 8px}
+.delta ul{list-style:none;margin:0;padding:0}
+.delta li{display:grid;grid-template-columns:56px minmax(0,1fr) auto;align-items:center;gap:10px;font-size:13px;min-height:26px}
+.delta li .ok{color:var(--ok);font-weight:700}
+.delta li .bad{color:var(--bad);font-weight:700}
+.dl-track{position:relative;height:8px;border-radius:2px;background:var(--paper)}
+.dl-have{position:absolute;inset:0 auto 0 0;border-radius:2px 0 0 2px;background:var(--accent)}
+.dl-add{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(135deg,rgba(var(--accent-rgb),.55) 0 3px,var(--accentline) 3px 6px)}
+.dl-need{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink)}
+.fillbox .delta-note{font-size:13px;color:var(--ink2);margin:8px 0 12px;line-height:1.55}
+.fillbox .linked{font-size:13px;margin:0 0 4px;color:var(--ink2)}
+.linked b{color:var(--warn);margin-right:6px}
+.fillbox .act-btns{align-items:center}
+.fillbox .act-btns .go{margin-right:12px}
+.fillbox .act-btns .muted{flex:1 1 180px;font-size:12px}
+.rows .empty p{margin:0 0 12px}
+
+/* 공고 포스터 썸네일: 목록, 채울 활동, 상세 제목 옆 (상세는 누르면 크게) */
+.p-thumb{flex:none;width:36px;height:48px;object-fit:cover;border-radius:var(--r-tag);outline:1px solid rgba(0,0,0,.1);outline-offset:-1px;background:var(--wash)}
+.r-body{display:flex;gap:16px;align-items:flex-start;min-width:0}
+.r-body > span{min-width:0}
+.acts li.p-row{display:flex;gap:14px;align-items:flex-start}
+.acts li.p-row > div{flex:1;min-width:0}
+
+/* 확인 필요와 틈 추정: 공고 원문에서 확인하지 못한 값, 틈이 추정한 값은 흐린 글자로 */
+.unk{color:var(--ink3);font-weight:500}
+.est{font-size:11px;font-weight:500;color:var(--ink3);margin-left:6px;white-space:nowrap}
+
+/* 목록 줄: 점수 근거 한 줄과 관심 버튼 */
+.act-li{display:flex;align-items:stretch}
+.act-li > .row{flex:1;min-width:0}
+.r-why{display:block;margin-top:5px;font-size:12px;line-height:1.5;color:var(--ink2)}
+.act-save{flex:none;width:44px;border:0;border-bottom:1px solid var(--grid);background:none;color:var(--ink3);font-size:18px;cursor:pointer;transition-property:color,background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+.act-save[aria-pressed="true"]{color:var(--accent)}
+@media (hover:hover) and (pointer:fine){.act-save:hover{color:var(--accent);background:var(--soft)}}
+.act-li:last-child .act-save{border-bottom:0}
+.act-li:has(.row[aria-current="true"]) .act-save{background:var(--accentwash)}
+
+/* 목록 도구: 검색, 온라인만, 이번 주 마감, 더 보기 */
+.act-q{flex:1 1 220px;min-width:0}
+.act-soon{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin:0 0 12px;font-size:13px;color:var(--ink2)}
+.act-soon b{color:var(--bad)}
+.act-more{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:16px 10px}
+
+/* 관심 활동 목록 */
+/* 캔버스 위에 뜬 흰 시트 (평평한 회색 칸은 캔버스 위에서 구멍처럼 보입니다) */
+.saved-d{background:var(--paper);border-radius:var(--r-panel);box-shadow:var(--shadow-card);margin:0 0 14px}
+.saved-d > summary{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding:11px 14px;cursor:pointer;font-size:14px;font-weight:700}
+.saved-d > summary span{font-size:13px;font-weight:500;color:var(--ink2)}
+.saved-d ul{list-style:none;margin:0;padding:0 14px}
+.saved-d li{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:7px 0;font-size:13px}
+.saved-d li + li{border-top:1px solid var(--grid)}
+.saved-d li .linkbtn{text-align:left;color:var(--ink)}
+.saved-d li > span{flex:none;color:var(--ink2)}
+.saved-d li > span.urgent{color:var(--bad);font-weight:700}
+.saved-d > .btn{margin:8px 14px 12px}
+
+/* 첫 화면 한 줄: 내 경험창고의 빈 역량과 목록 순서를 잇습니다 */
+.acts-frame{margin:-6px 0 18px;font-size:14px;line-height:1.6;color:var(--ink)}
+.acts-frame a{font-weight:700;text-underline-offset:3px}
+.acts-frame .go{font:inherit;font-size:13px;font-weight:700;margin-left:6px}
+
+/* 상세: 제목과 포스터 썸네일, 신뢰 줄, 바로 아래 매칭 점수 근거 */
+.d-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:start;margin-bottom:18px}
+.d-head .d-host{margin-bottom:6px}
+.d-title:focus{outline:none}
+.d-title:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.d-trust{margin:0;font-size:12px;color:var(--ink3)}
+.d-links{display:flex;flex-wrap:wrap;align-items:center;gap:2px 14px;margin:6px 0 0}
+.d-links .linkbtn{font-size:13px}
+.act-save-d[aria-pressed="true"]{color:var(--accent);font-weight:700}
+.d-thumb{display:block;padding:0;border:0;background:none;cursor:zoom-in;border-radius:var(--r-tag)}
+.d-thumb img{display:block;width:72px;height:96px;object-fit:cover;border-radius:var(--r-tag);outline:1px solid rgba(0,0,0,.1);outline-offset:-1px;background:var(--wash)}
+.d-score{margin-top:0}
+.bk-item{margin-bottom:10px}
+.bk-item .bk{margin-bottom:2px}
+.bk-why{margin:0 0 0 86px;font-size:12px;line-height:1.5;color:var(--ink2)}
+.bk.unknown + .bk-why{color:var(--ink3)}
+.how{margin-top:6px;font-size:13px;color:var(--ink2)}
+.how > summary{cursor:pointer;font-weight:700;color:var(--accent);padding:4px 0}
+.how p{margin:8px 0 6px;line-height:1.6}
+.how ul{list-style:none;margin:0;padding:0;line-height:1.6}
+.how li{margin-bottom:8px}
+.act-back{display:none}
+
+/* 포스터 크게 보기 */
+dialog.poster-dlg{border:0;border-radius:var(--r-panel);padding:14px;max-width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 32px);box-shadow:var(--shadow-pop);background:var(--paper)}
+dialog.poster-dlg::backdrop{background:rgba(22,26,39,.55)}
+.poster-dlg form{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.poster-dlg h2{margin:0;font-size:15px}
+.poster-dlg img{display:block;max-width:100%;max-height:calc(100vh - 120px);margin:0 auto;border-radius:var(--r-ctl)}
+
+/* 주간 격자 일정 이름: 단어 중간에서 끊지 않고, 넘치면 잘라 둡니다 (전체 이름은 title) */
+.week .blk{overflow-wrap:normal;word-break:keep-all}
+
+@media (max-width:1240px){
+  /* 상세가 목록 아래로 내려가면 고른 줄로 돌아가는 연결을 위에 붙여 둡니다 */
+  .act-back{display:inline-flex;position:sticky;top:8px;z-index:3;margin:0 0 10px;background:var(--paper);padding:6px 10px;border-radius:var(--r-ctl);box-shadow:var(--shadow-card);text-decoration:none;font-weight:700;color:var(--accent)}
+}
+/* 1101~1240px는 머리가 떠 있으니 그 아래(72px)에 붙입니다 */
+@media (min-width:1101px) and (max-width:1240px){ .act-back{top:72px} }
+@media (max-width:760px){
+  .r-body{gap:12px}
+  /* 첫 활동을 더 위로: 부제는 위 한 줄이 대신하고, 목록 도구 간격을 줄입니다 */
+  #view-activities .view-h > p{display:none}
+  .acts-frame{margin:-4px 0 12px;font-size:13px}
+  /* 검색과 정렬을 한 줄에, 기준과 종류는 한 줄씩, 체크와 개수를 마지막 한 줄에 */
+  .list-head{gap:8px}
+  .act-q{order:0;flex:1 1 0}
+  .list-head #sort{order:1;flex:none}
+  .list-head #mode{order:2;flex-basis:100%}
+  .list-head #kinds{order:3;flex-basis:100%}
+  .list-head .toggle{order:4;font-size:13px}
+  .list-head .count{order:5}
+  .act-soon{margin-bottom:8px}
+  .bk-why{margin-left:0}
+  .d-thumb img{width:56px;height:75px}
+  .act-save{width:36px}
+}
+.r-why > span{white-space:nowrap}
+/* 중립 항목은 다른 항목 평균으로 채운 값이라 막대를 흐리게 */
+.bk.unknown .bar i{background:var(--line)}
+.bk-item .bk{grid-template-columns:76px minmax(0,1fr) auto}
+.bk-item .bk .v{white-space:nowrap}
+/* 목록 포스터: 신뢰 신호로 읽히는 크기 (3:4). 좁은 화면은 글 칸을 남기려고 조금 작게 */
+/* 포스터에는 그림자를 얹어 시트 위의 한 층으로 보이게 합니다 */
+.r-body .p-thumb,.acts li.p-row .p-thumb,.d-thumb img{box-shadow:0 1px 2px rgba(29,28,25,.08),0 6px 14px -6px rgba(29,28,25,.22)}
+.r-body .p-thumb{width:96px;height:128px;border-radius:var(--r-panel)}
+@media (max-width:760px){
+  .r-body .p-thumb{width:64px;height:85px}
+  /* 좁은 화면: 마감을 글 아래로 내려 제목 칸을 넓힙니다 */
+  .act-li .row{grid-template-columns:44px minmax(0,1fr);row-gap:8px}
+  .act-li .row .dday{grid-column:2;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;text-align:left;font-size:13px}
+  .act-li .row .dday span{display:inline;margin:0}
+  .act-li .score{font-size:22px}
+}
+/* 내 조건(#start) 한 줄 */
+.act-prof{margin:0 0 10px;font-size:13px;color:var(--ink2)}
+.act-prof .go{margin-left:8px}
+/* 관심 분야 묶음: 묶음 버튼에 고른 것과 +N, 누르면 칩이 펼쳐집니다 */
+#interests{display:block}
+.int-g + .int-g{margin-top:2px}
+.int-h{display:flex;align-items:baseline;gap:8px;width:100%;padding:7px 2px;border:0;background:none;cursor:pointer;font-size:13px;text-align:left;border-radius:var(--r-ctl);transition-property:background-color;transition-duration:150ms;transition-timing-function:var(--ease-out)}
+@media (hover:hover) and (pointer:fine){.int-h:hover{background:var(--soft)}}
+.int-h::before{content:"+";flex:none;width:12px;color:var(--ink3);font-weight:700}
+.int-h[aria-expanded="true"]::before{content:"-"}
+.int-h b{flex:none;font-weight:700;color:var(--ink)}
+.int-h span{min-width:0;color:var(--accent);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.int-g > .chips{padding:2px 0 8px 20px}
+@media (max-width:760px){.int-h{min-height:36px;align-items:center}}
+/* 종류 탭 개수 */
+#kinds .kc{margin-left:5px;font-size:12px;font-weight:500;color:var(--ink2)}
+#kinds [aria-selected="true"] .kc{color:inherit;opacity:.8}
+/* 전공 조정: 막대 대신 가산과 감점 */
+.bk.adj .adj-note{font-size:12px;color:var(--ink2)}
+.bk.adj .v{color:var(--ok)}
+.bk.adj .v.neg,.r-why .neg{color:var(--bad)}
+.int-h span.none{color:var(--ink2);font-weight:500}
+.bk-cap{margin:-4px 0 8px;font-size:12px;font-weight:700;color:var(--ink2)}
+/* 새 경험 반영 한 줄 */
+.act-loop{background:var(--paper);border-radius:var(--r-panel);box-shadow:var(--shadow-card);padding:12px 16px;margin:-6px 0 18px;font-size:14px;line-height:1.6}
+.act-loop p{margin:0}
+.act-loop p .go,.act-loop p .linkbtn{margin-left:12px}
+.act-loop b{color:var(--ok)}
+.act-loop ol{margin:8px 0 0;padding-left:20px;font-size:13px}
+.act-loop li{padding:3px 0}
+.act-loop li span{margin-left:10px;color:var(--ink2)}
+
+/* 움직임 '포스터가 상세로 커짐'(m-morph): 고른 줄 포스터와 상세 포스터가 같은 이름으로 이어집니다 */
+html.m-morph ::view-transition-group(poster-sel){animation-duration:350ms;animation-timing-function:cubic-bezier(.32,.72,0,1);z-index:50}
+html.m-morph ::view-transition-old(poster-sel),html.m-morph ::view-transition-new(poster-sel){height:100%;width:100%;object-fit:cover}
+
+/* 움직임 '뒤 화면 밀려남'(m-push): 1240px 이하에서 상세가 아래에서 올라오는 시트가 됩니다 (JS가 is-sheet, open을 붙입니다) */
+.sheet-bd{position:fixed;inset:0;background:rgba(0,0,0,.2);z-index:39}
+@media (max-width:1240px){
+  section.act-detail.is-sheet{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:40;max-height:88vh;overflow:auto;overscroll-behavior:contain;margin:0;
+    border-radius:var(--r-panel) var(--r-panel) 0 0;box-shadow:var(--shadow-float);translate:0 100%;visibility:hidden;
+    transition-property:translate,visibility;transition-duration:400ms,0s;transition-delay:0s,400ms;transition-timing-function:cubic-bezier(.32,.72,0,1)}
+  section.act-detail.is-sheet.open{translate:0 0;visibility:visible;transition-delay:0s,0s}
+  section.act-detail.is-sheet .act-back{top:0}
+  .acts-grid.sheet-back > :not(.act-detail){scale:.98;translate:0 8px;transform-origin:50% 0;transition-property:scale,translate;transition-duration:400ms;transition-timing-function:cubic-bezier(.32,.72,0,1)}
+  .acts-grid > :not(.act-detail){transition-property:scale,translate;transition-duration:400ms;transition-timing-function:cubic-bezier(.32,.72,0,1)}
+}
+html.sheet-lock{overflow:hidden}
+@media (prefers-reduced-motion:reduce){
+  section.act-detail.is-sheet,.acts-grid > *{transition:none!important}
+}

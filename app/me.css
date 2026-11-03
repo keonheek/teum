@@ -1,0 +1,40 @@
+/* 내 역량 화면 전용 스타일. 공통 토큰과 컴포넌트는 app.css에 있습니다 */
+/* 경험 카드 아래 연결 한 줄: 팀 상태(ok)나 배정된 문항(accent)을 색 글자로, 옆에 그 화면으로 가는 연결 */
+.exp-link{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px;margin:8px 0 0;font-size:13px;line-height:1.5}
+.exp-link b{font-weight:700}
+.exp-link .ok{color:var(--ok)}
+.exp-link .ac{color:var(--accent)}
+.acts .act-btns{align-items:center}
+.acts .act-btns .go{margin-left:6px}
+.tip .go-row button.go{font:inherit;font-size:13px;font-weight:700}
+.muted .linkbtn{font-size:inherit;color:var(--accent);padding:0 2px}
+/* 상자 제목은 h1 바로 아래 단계라 h2로 씁니다 (모양은 다른 화면의 .box h3와 같게) */
+.box > h2.box-h{font-size:15px;margin:0 0 10px}
+/* 상태 글자가 길어진 만큼(부족, 활동 찾기 / 직무 무관) 오른쪽 칸을 내용에 맞춥니다 */
+.me .gap-row{grid-template-columns:62px minmax(0,1fr) 96px}
+.me .gap-row .st{white-space:nowrap}
+/* NCS 대응: 역량 지도 아래 접힌 표 */
+.ncs{margin-top:10px;font-size:13px}
+.ncs > summary{cursor:pointer;font-weight:700;color:var(--accent);padding:4px 0}
+.ncs table{width:100%;border-collapse:collapse;margin:8px 0 6px}
+.ncs th,.ncs td{text-align:left;padding:6px 8px 6px 0;border-top:1px solid var(--grid);vertical-align:top;line-height:1.5}
+.ncs thead th{border-top:0;font-size:12px;color:var(--ink2);font-weight:600}
+.ncs tbody th{width:72px;font-weight:700;white-space:nowrap}
+.ncs .muted{margin:4px 0 0}
+/* 채울 활동 포스터: 아이콘이 아니라 공고 자체로 읽히는 크기 (3:4) */
+.acts li.p-row .p-thumb{width:120px;height:160px;border-radius:var(--r-panel)}
+@media (max-width:760px){
+  .acts li.p-row .p-thumb{width:96px;height:128px}
+  /* 역량 8개: 좁은 화면에서는 줄 간격과 상태 글자를 조금 줄입니다 */
+  .me .gap-row{grid-template-columns:58px minmax(0,1fr) 92px;gap:8px;min-height:28px}
+  .me .gap-row .st{font-size:12px}
+}
+/* 움직임 '쌓이는 카드'(m-stack): 경험 카드가 머리 아래에 차례로 붙고, 뒤 카드가 덮을수록 앞 카드가 0.04씩 작아집니다 */
+@media (prefers-reduced-motion:no-preference){
+  @supports (animation-timeline: view()){
+    html.m-stack #view-me .lib-list{view-timeline-name:--libstack}
+    html.m-stack #view-me .lib-item{position:sticky;top:calc(84px + var(--si) * 12px);transform-origin:50% 0;
+      animation:me-stack linear both;animation-timeline:--libstack;animation-range:exit-crossing calc(var(--si) / var(--n) * 100%) exit-crossing calc((var(--si) + 1) / var(--n) * 100%)}
+    @keyframes me-stack{to{scale:calc(1 - .04 * (var(--n) - 1 - var(--si)))}}
+  }
+}

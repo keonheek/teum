@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>틈으로 이동</title>
+<!-- 예전 경험창고 주소(#match, #apply, #library)를 하나로 합친 앱으로 옮깁니다. 경험창고는 이제 내 역량 화면입니다 -->
+<script>
+const h = location.hash.slice(1);
+location.replace('../#' + ({match: 'match', apply: 'apply'}[h] || 'me'));
+</script>
+</head>
+<body><p><a href="../#me">틈 내 역량으로 이동</a></p></body>
+</html>

@@ -1,0 +1,7 @@
+shared/scrape/
+shared/*.py
+screenshots/
+.vercel
+.env*
+.gitignore
+.vercelignore
